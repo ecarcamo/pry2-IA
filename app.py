@@ -30,6 +30,8 @@ heuristic_name = st.selectbox(
     ["Manhattan", "Euclidean"]
 )
 
+animate = st.checkbox("Animate solution")
+
 run_button = st.button("Run Solver")
 
 
@@ -64,8 +66,10 @@ if uploaded_file and run_button:
 
     st.subheader("Maze Info")
 
+    st.write("Maze size:", maze.rows, "x", maze.cols)
     st.write("Start:", maze.start)
     st.write("Goal:", maze.goal)
+    st.write("Heuristic used:", heuristic_name)
 
     st.subheader("Results")
 
@@ -73,11 +77,25 @@ if uploaded_file and run_button:
     st.write("Nodes explored:", result["nodes_explored"])
     st.write("Runtime:", round(result["runtime"], 5), "seconds")
 
+    total_cells = maze.rows * maze.cols
+    explored_ratio = result["nodes_explored"] / total_cells
+
+    st.write("Explored ratio:", round(explored_ratio * 100, 2), "%")
+
     st.subheader("Solution")
 
-    fig = visualize_maze(maze, result["path"])
+    if animate:
 
-    st.pyplot(fig)
+        from utils.visualization import animate_solution
+
+        animation_container = st.empty()
+
+        animate_solution(maze, result["path"], animation_container)
+
+    else:
+
+        fig = visualize_maze(maze, result["path"])
+        st.pyplot(fig)
 
     st.subheader("Algorithm Comparison")
 
