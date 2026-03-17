@@ -5,7 +5,7 @@ def measure_algorithm(algorithm, maze):
 
     start_time = time.perf_counter()
 
-    path, nodes_explored = algorithm(maze)
+    path, nodes_explored, explored = algorithm(maze)
 
     end_time = time.perf_counter()
 
@@ -17,5 +17,6 @@ def measure_algorithm(algorithm, maze):
         "path": path,
         "path_length": path_length,
         "nodes_explored": nodes_explored,
+        "explored": explored,
         "runtime": runtime
     }

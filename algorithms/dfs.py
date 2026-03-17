@@ -33,7 +33,8 @@ def dfs(maze):
 
     path = reconstruct_path(parent, start, goal)
 
-    return path, nodes_explored
+    return path, nodes_explored, visited
+
 
 def reconstruct_path(parent, start, goal):
 
@@ -42,6 +43,9 @@ def reconstruct_path(parent, start, goal):
     current = goal
 
     while current != start:
+
+        if current not in parent:
+            return []
 
         path.append(current)
 

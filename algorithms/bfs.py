@@ -14,12 +14,14 @@ def bfs(maze):
     parent = {}
 
     nodes_explored = 0
+    explored_order = []
 
     while queue:
 
         current = queue.popleft()
 
         nodes_explored += 1
+        explored_order.append(current)
 
         if current == goal:
             break
@@ -36,7 +38,8 @@ def bfs(maze):
 
     path = reconstruct_path(parent, start, goal)
 
-    return path, nodes_explored
+    return path, nodes_explored, visited
+
 
 def reconstruct_path(parent, start, goal):
 
@@ -45,6 +48,9 @@ def reconstruct_path(parent, start, goal):
     current = goal
 
     while current != start:
+
+        if current not in parent:
+            return []
 
         path.append(current)
 

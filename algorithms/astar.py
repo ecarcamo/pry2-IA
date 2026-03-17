@@ -48,7 +48,7 @@ def astar(maze, heuristic):
 
     path = reconstruct_path(parent, start, goal)
 
-    return path, nodes_explored
+    return path, nodes_explored, visited
 
 def reconstruct_path(parent, start, goal):
 
