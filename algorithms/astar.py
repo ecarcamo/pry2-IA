@@ -17,6 +17,7 @@ def astar(maze, heuristic):
     visited = set()
 
     nodes_explored = 0
+    explored_order = []
 
     while open_list:
 
@@ -28,6 +29,7 @@ def astar(maze, heuristic):
         visited.add(current)
 
         nodes_explored += 1
+        explored_order.append(current)
 
         if current == goal:
             break
@@ -48,7 +50,7 @@ def astar(maze, heuristic):
 
     path = reconstruct_path(parent, start, goal)
 
-    return path, nodes_explored, visited
+    return path, nodes_explored, explored_order
 
 def reconstruct_path(parent, start, goal):
 

@@ -38,7 +38,7 @@ def bfs(maze):
 
     path = reconstruct_path(parent, start, goal)
 
-    return path, nodes_explored, visited
+    return path, nodes_explored, explored_order
 
 
 def reconstruct_path(parent, start, goal):

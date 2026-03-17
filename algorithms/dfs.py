@@ -11,12 +11,14 @@ def dfs(maze):
     parent = {}
 
     nodes_explored = 0
+    explored_order = []
 
     while stack:
 
         current = stack.pop()
 
         nodes_explored += 1
+        explored_order.append(current)
 
         if current == goal:
             break
@@ -33,7 +35,7 @@ def dfs(maze):
 
     path = reconstruct_path(parent, start, goal)
 
-    return path, nodes_explored, visited
+    return path, nodes_explored, explored_order
 
 
 def reconstruct_path(parent, start, goal):

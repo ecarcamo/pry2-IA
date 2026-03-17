@@ -16,6 +16,7 @@ def greedy(maze, heuristic):
     parent = {}
 
     nodes_explored = 0
+    explored_order = [start]
 
     while open_list:
 
@@ -31,6 +32,7 @@ def greedy(maze, heuristic):
             if neighbor not in visited:
 
                 visited.add(neighbor)
+                explored_order.append(neighbor)
 
                 parent[neighbor] = current
 
@@ -40,7 +42,7 @@ def greedy(maze, heuristic):
 
     path = reconstruct_path(parent, start, goal)
 
-    return path, nodes_explored, visited
+    return path, nodes_explored, explored_order
 
 def reconstruct_path(parent, start, goal):
 

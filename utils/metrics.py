@@ -20,3 +20,20 @@ def measure_algorithm(algorithm, maze):
         "explored": explored,
         "runtime": runtime
     }
+
+
+def branching_factor(nodes_explored: int, depth: int) -> float:
+    """
+    Estima el branching factor efectivo b usando la aproximación:
+        b ≈ N^(1/d)
+    donde N = nodos explorados, d = profundidad de la solución (path length).
+
+    Casos borde:
+      - depth <= 1  → imposible estimar; retorna float(nodes_explored)
+      - nodes_explored == 0 → retorna 0.0
+    """
+    if nodes_explored == 0:
+        return 0.0
+    if depth <= 1:
+        return float(nodes_explored)
+    return round(nodes_explored ** (1.0 / depth), 4)
