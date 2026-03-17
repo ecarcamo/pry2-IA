@@ -1,15 +1,74 @@
+import streamlit as st
+
 from maze.loader import load_maze, find_start_goal
 from maze.maze import Maze
 
-maze_grid = load_maze("test_mazes/test_maze.txt")
+from algorithms.bfs import bfs
+from algorithms.dfs import dfs
+from algorithms.greedy import greedy
+from algorithms.astar import astar
 
-start, goal = find_start_goal(maze_grid)
+from heuristics.manhattan import manhattan
+from heuristics.euclidean import euclidean
 
-maze = Maze(maze_grid, start, goal)
+from utils.metrics import measure_algorithm
+from utils.visualization import visualize_maze
 
-print("Start:", maze.start)
-print("Goal:", maze.goal)
 
-neighbors = maze.get_neighbors(start)
+st.title("Maze Solver")
 
-print("Neighbors of start:", neighbors)
+uploaded_file = st.file_uploader("Upload maze file", type=["txt"])
+
+algorithm_name = st.selectbox(
+    "Select Algorithm",
+    ["BFS", "DFS", "Greedy", "A*"]
+)
+
+heuristic_name = st.selectbox(
+    "Select Heuristic",
+    ["Manhattan", "Euclidean"]
+)
+
+run_button = st.button("Run Solver")
+
+
+if uploaded_file and run_button:
+
+    maze_grid = []
+
+    for line in uploaded_file:
+        row = [int(c) for c in line.decode().strip()]
+        maze_grid.append(row)
+
+    start, goal = find_start_goal(maze_grid)
+
+    maze = Maze(maze_grid, start, goal)
+
+    if heuristic_name == "Manhattan":
+        heuristic = manhattan
+    else:
+        heuristic = euclidean
+
+    if algorithm_name == "BFS":
+        result = measure_algorithm(bfs, maze)
+
+    elif algorithm_name == "DFS":
+        result = measure_algorithm(dfs, maze)
+
+    elif algorithm_name == "Greedy":
+        result = measure_algorithm(lambda m: greedy(m, heuristic), maze)
+
+    elif algorithm_name == "A*":
+        result = measure_algorithm(lambda m: astar(m, heuristic), maze)
+
+    st.subheader("Results")
+
+    st.write("Path length:", result["path_length"])
+    st.write("Nodes explored:", result["nodes_explored"])
+    st.write("Runtime:", result["runtime"])
+
+    st.subheader("Solution")
+
+    fig = visualize_maze(maze, result["path"])
+
+    st.pyplot(fig)
