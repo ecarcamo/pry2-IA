@@ -9,14 +9,15 @@ import time
 #  0 = pasillo libre     1 = pared         2 = inicio
 #  3 = meta              4 = camino        5 = explorado (frío)
 #  6 = frontera activa   (animación)
+# Paleta de colores Modern Dashboard (Midnight Slate)
 MAZE_COLORS = [
-    "#F5F5F0",  # 0 pasillo
-    "#1A1A2E",  # 1 pared
-    "#00C853",  # 2 inicio
-    "#FF6D00",  # 3 meta
-    "#00B0FF",  # 4 camino solución
-    "#FFD54F",  # 5 explorado (amarillo cálido)
-    "#FF1744",  # 6 frontera activa (rojo)
+    "#0F172A",  # 0 pasillo libre (slate 900)
+    "#334155",  # 1 pared (slate 700)
+    "#10B981",  # 2 inicio (emerald)
+    "#F43F5E",  # 3 meta (rose)
+    "#06B6D4",  # 4 camino óptimo (cyan)
+    "#1E40AF",  # 5 explorado (blue-800)
+    "#F59E0B",  # 6 frontera activa / animando (amber)
 ]
 
 MAZE_CMAP = ListedColormap(MAZE_COLORS)
@@ -56,9 +57,9 @@ def heatmap_maze(maze, explored_order, path=None, algo_name=""):
         interpolation="nearest", alpha=0.4,
     )
 
-    # Capa 2: paredes (color sólido #1A1A2E)
+    # Capa 2: paredes (color sólido #334155)
     wall_mask = np.ma.masked_where(grid != 1, np.ones((rows, cols)))
-    wall_cmap = ListedColormap(["#1A1A2E"])
+    wall_cmap = ListedColormap(["#334155"])
     ax.imshow(wall_mask, cmap=wall_cmap, vmin=0.5, vmax=1.5,
               interpolation="nearest")
 
@@ -69,47 +70,47 @@ def heatmap_maze(maze, explored_order, path=None, algo_name=""):
         interpolation="nearest", alpha=0.92,
     )
 
-    # Capa 4: camino solución (azul translúcido)
+    # Capa 4: camino solución (cian translucido)
     if path:
         path_mat = np.full((rows, cols), np.nan)
         for r, c in path:
             path_mat[r][c] = 1.0
-        path_cmap = ListedColormap(["#00B0FF"])
+        path_cmap = ListedColormap(["#06B6D4"])
         ax.imshow(np.ma.masked_invalid(path_mat), cmap=path_cmap,
                   vmin=0.5, vmax=1.5, interpolation="nearest", alpha=0.75)
 
     # Marcadores de inicio y meta
     sr, sc = maze.start
     gr, gc = maze.goal
-    ax.plot(sc, sr, "o", color="#00C853", markersize=14,
+    ax.plot(sc, sr, "o", color="#10B981", markersize=14,
             markeredgecolor="white", markeredgewidth=1.5, zorder=10)
-    ax.plot(gc, gr, "*", color="#FF6D00", markersize=16,
+    ax.plot(gc, gr, "*", color="#F43F5E", markersize=16,
             markeredgecolor="white", markeredgewidth=1.5, zorder=10)
 
     # Colorbar
     cbar = fig.colorbar(heat_img, ax=ax, fraction=0.028, pad=0.02)
     cbar.set_ticks([0, 0.25, 0.5, 0.75, 1.0])
     cbar.set_ticklabels(["Primero", "25%", "50%", "75%", "Último"])
-    cbar.ax.yaxis.set_tick_params(color="#E8E8F0", labelsize=8)
-    plt.setp(cbar.ax.yaxis.get_ticklabels(), color="#E8E8F0")
-    cbar.set_label("Orden de exploración", color="#E8E8F0", fontsize=9)
-    cbar.outline.set_edgecolor("#444")
+    cbar.ax.yaxis.set_tick_params(color="#F8FAFC", labelsize=8)
+    plt.setp(cbar.ax.yaxis.get_ticklabels(), color="#F8FAFC")
+    cbar.set_label("Orden de exploración", color="#F8FAFC", fontsize=9)
+    cbar.outline.set_edgecolor("#334155")
 
     # Leyenda manual
     legend_elements = [
         mpatches.Patch(facecolor="#FFFF80", label="Explorado primero"),
         mpatches.Patch(facecolor="#CC0000", label="Explorado último"),
-        mpatches.Patch(facecolor="#00B0FF", label="Camino óptimo"),
-        mpatches.Patch(facecolor="#1A1A2E", label="Pared"),
+        mpatches.Patch(facecolor="#06B6D4", label="Camino óptimo"),
+        mpatches.Patch(facecolor="#334155", label="Pared"),
     ]
     ax.legend(handles=legend_elements, loc="lower right", fontsize=7,
-              framealpha=0.85, facecolor="#1A1A2E",
-              labelcolor="#E8E8F0", edgecolor="#444")
+              framealpha=0.85, facecolor="#1E293B",
+              labelcolor="#94A3B8", edgecolor="#334155")
 
     title = f"Mapa de Calor — Orden de Exploración"
     if algo_name:
         title += f"  [{algo_name}]"
-    ax.set_title(title, color="#E8E8F0", fontsize=11, pad=8, fontweight="bold")
+    ax.set_title(title, color="#F8FAFC", fontsize=11, pad=8, fontweight="bold")
     ax.set_xticks([])
     ax.set_yticks([])
     plt.tight_layout(pad=0.4)
@@ -141,31 +142,30 @@ def _build_display(maze, path=None, explored=None):
 
 def _add_legend(ax, show_explored=False, show_frontier=False):
     elements = [
-        mpatches.Patch(facecolor="#00C853", edgecolor="#00C853", label="Inicio"),
-        mpatches.Patch(facecolor="#FF6D00", edgecolor="#FF6D00", label="Meta"),
-        mpatches.Patch(facecolor="#00B0FF", edgecolor="#00B0FF", label="Camino"),
-        mpatches.Patch(facecolor="#1A1A2E", edgecolor="#555",    label="Pared"),
+        mpatches.Patch(facecolor="#10B981", edgecolor="#10B981", label="Inicio"),
+        mpatches.Patch(facecolor="#F43F5E", edgecolor="#F43F5E", label="Meta"),
+        mpatches.Patch(facecolor="#06B6D4", edgecolor="#06B6D4", label="Camino"),
+        mpatches.Patch(facecolor="#334155", edgecolor="#334155", label="Pared"),
     ]
     if show_explored:
-        elements.insert(2, mpatches.Patch(facecolor="#FFD54F", edgecolor="#FFD54F", label="Explorado"))
+        elements.insert(2, mpatches.Patch(facecolor="#1E40AF", edgecolor="#1E40AF", label="Explorado"))
     if show_frontier:
-        elements.insert(2, mpatches.Patch(facecolor="#FF1744", edgecolor="#FF1744", label="Frontera"))
+        elements.insert(2, mpatches.Patch(facecolor="#F59E0B", edgecolor="#F59E0B", label="Frontera"))
     ax.legend(
         handles=elements,
         loc="upper right",
         fontsize=7,
         framealpha=0.85,
-        facecolor="#1A1A2E",
-        labelcolor="#E8E8F0",
-        edgecolor="#444",
+        facecolor="#1E293B",
+        labelcolor="#94A3B8",
+        edgecolor="#334155",
     )
 
-
-def _render_frame(display, title="", title_color="#E8E8F0", figsize=6,
+def _render_frame(display, title="", title_color="#F8FAFC", figsize=6,
                   show_explored=False, show_frontier=False):
     fig, ax = plt.subplots(figsize=(figsize, figsize))
-    fig.patch.set_facecolor("#0F0F23")
-    ax.set_facecolor("#0F0F23")
+    fig.patch.set_facecolor("#0F172A")
+    ax.set_facecolor("#0F172A")
     ax.imshow(display, cmap=MAZE_CMAP, vmin=0, vmax=6, interpolation="nearest")
     ax.set_xticks([])
     ax.set_yticks([])
@@ -241,7 +241,7 @@ def animate_solution(maze, path, explored, container, speed=30):
         fig = _render_frame(
             frame,
             title=f"Explorando...  {progress}%  ({min(i + step_size, total)}/{total} nodos)",
-            title_color="#FF5252",
+            title_color="#F59E0B",
             show_explored=True,
             show_frontier=True,
         )
@@ -256,7 +256,7 @@ def animate_solution(maze, path, explored, container, speed=30):
     fig = _render_frame(
         frame_final,
         title=f"Exploración completa — {total} nodos visitados",
-        title_color="#FFD54F",
+        title_color="#60A5FA",
         show_explored=True,
     )
     container.pyplot(fig)
@@ -274,7 +274,7 @@ def animate_solution(maze, path, explored, container, speed=30):
         fig = _render_frame(
             path_display,
             title=f"Trazando camino óptimo... ({step_idx + 1}/{len(path)})",
-            title_color="#00B0FF",
+            title_color="#06B6D4",
             show_explored=True,
         )
         container.pyplot(fig)
@@ -285,7 +285,7 @@ def animate_solution(maze, path, explored, container, speed=30):
     fig = _render_frame(
         path_display,
         title=f"Camino encontrado — {len(path)} pasos",
-        title_color="#00C853",
+        title_color="#10B981",
         show_explored=True,
     )
     container.pyplot(fig)
@@ -325,11 +325,11 @@ def visualize_maze_plotly(maze, path=None, explored=None, show_explored=True):
 
     CELL_LABELS = {
         0: "Pasillo libre",
-        1: "🧱 Pared",
-        2: "🟢 Inicio",
-        3: "🎯 Meta",
-        4: "🔵 Camino",
-        5: "🟡 Explorado",
+        1: "Pared",
+        2: "Inicio",
+        3: "Meta",
+        4: "Camino",
+        5: "Explorado",
     }
 
     for r in range(rows):
@@ -350,7 +350,7 @@ def visualize_maze_plotly(maze, path=None, explored=None, show_explored=True):
                 z[r][c] = 5
                 hover[r][c] = (
                     f"<b>({r}, {c})</b><br>"
-                    f"Tipo: 🟡 Explorado<br>"
+                    f"Tipo: Explorado<br>"
                     f"Orden de exploración: #{explore_idx[(r,c)]}<br>"
                     f"Dist. Manhattan a meta: {_mdist(r,c)}"
                 )
@@ -361,7 +361,7 @@ def visualize_maze_plotly(maze, path=None, explored=None, show_explored=True):
             z[r][c] = 4
             hover[r][c] = (
                 f"<b>({r}, {c})</b><br>"
-                f"Tipo: 🔵 Camino<br>"
+                f"Tipo: Camino<br>"
                 f"Paso: {path_idx[(r,c)]} / {len(path_list)}<br>"
                 f"Dist. Manhattan a meta: {_mdist(r,c)}"
             )
@@ -369,18 +369,18 @@ def visualize_maze_plotly(maze, path=None, explored=None, show_explored=True):
     # Inicio / meta
     z[sr][sc] = 2
     z[gr][gc] = 3
-    hover[sr][sc] = f"<b>({sr}, {sc})</b><br>Tipo: 🟢 Inicio"
-    hover[gr][gc] = f"<b>({gr}, {gc})</b><br>Tipo: 🎯 Meta"
+    hover[sr][sc] = f"<b>({sr}, {sc})</b><br>Tipo: Inicio"
+    hover[gr][gc] = f"<b>({gr}, {gc})</b><br>Tipo: Meta"
 
     # ── Colorscale discreta (6 bandas, una por valor 0–5) ────────────────────
     # Normalizado al rango [0, 1] sobre vmax=5
     _cs = [
-        [0.000, "#F5F5F0"], [0.199, "#F5F5F0"],   # 0 pasillo
-        [0.200, "#1A1A2E"], [0.399, "#1A1A2E"],   # 1 pared
-        [0.400, "#00C853"], [0.599, "#00C853"],   # 2 inicio
-        [0.600, "#FF6D00"], [0.799, "#FF6D00"],   # 3 meta
-        [0.800, "#00B0FF"], [0.899, "#00B0FF"],   # 4 camino
-        [0.900, "#FFD54F"], [1.000, "#FFD54F"],   # 5 explorado
+        [0.000, "#0F172A"], [0.199, "#0F172A"],   # 0 pasillo
+        [0.200, "#334155"], [0.399, "#334155"],   # 1 pared
+        [0.400, "#10B981"], [0.599, "#10B981"],   # 2 inicio
+        [0.600, "#F43F5E"], [0.799, "#F43F5E"],   # 3 meta
+        [0.800, "#06B6D4"], [0.899, "#06B6D4"],   # 4 camino
+        [0.900, "#1E40AF"], [1.000, "#1E40AF"],   # 5 explorado
     ]
 
     fig = go.Figure()
@@ -405,7 +405,7 @@ def visualize_maze_plotly(maze, path=None, explored=None, show_explored=True):
         marker=dict(
             symbol=["circle", "star"],
             size=[16, 18],
-            color=["#00C853", "#FF6D00"],
+            color=["#10B981", "#F43F5E"],
             line=dict(color="white", width=2),
         ),
         text=["S", "G"],
@@ -416,13 +416,14 @@ def visualize_maze_plotly(maze, path=None, explored=None, show_explored=True):
     ))
 
     fig.update_layout(
-        paper_bgcolor="#0F0F23",
-        plot_bgcolor="#0F0F23",
-        margin=dict(l=5, r=5, t=40, b=5),
+        paper_bgcolor="#0F172A",
+        plot_bgcolor="#0F172A",
+        font=dict(color="#94A3B8", family="Inter, sans-serif"),
+        margin=dict(l=0, r=0, t=30, b=0),
         height=620,
         title=dict(
-            text="🗺️ Laberinto interactivo — pasa el cursor sobre las celdas",
-            font=dict(color="#E8E8F0", size=13),
+            text="Laberinto interactivo — pasa el cursor sobre las celdas",
+            font=dict(color="#F8FAFC", size=14),
             x=0.5,
         ),
         xaxis=dict(

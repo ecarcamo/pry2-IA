@@ -144,21 +144,82 @@ def run_benchmark(
 # ─── Configuración de página ─────────────────────────────────────────────────
 st.set_page_config(
     page_title="Maze Solver · IA",
-    page_icon="🧩",
+    page_icon="🔹",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# CSS adicional para pulir detalles visuales
+# CSS adicional para pulir detalles visuales (Estilo Dashboard Premium)
 st.markdown(
     """
     <style>
-        .block-container { padding-top: 1.5rem; padding-bottom: 1rem; }
-        .stMetric { background-color: #1A1A3E; border-radius: 10px; padding: 0.6rem 1rem; }
-        .stMetric label { color: #A0A8D0 !important; font-size: 0.78rem; }
-        .stMetric [data-testid="metric-container"] > div:nth-child(2) { font-size: 1.5rem; color: #E8E8F0; font-weight: 700; }
-        .algo-badge { display:inline-block; padding:2px 10px; border-radius:12px; font-weight:600; font-size:0.85rem; }
-        div[data-testid="stSidebar"] { border-right: 1px solid #2A2A5A; }
+        /* Ocultar header y footer nativos de Streamlit */
+        header {visibility: hidden;}
+        footer {visibility: hidden;}
+        
+        /* Espaciado del lienzo principal */
+        .block-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            max-width: 1200px;
+        }
+
+        /* Estilización moderna de las tarjetas de métricas (KPIs) */
+        div[data-testid="metric-container"] {
+            background: linear-gradient(145deg, #1e1e2f, #252538);
+            border: 1px solid #2d2d44;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        div[data-testid="metric-container"]:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Color y estilo del label de la métrica */
+        div[data-testid="metric-container"] > div:nth-child(1) {
+            color: #a0a0b8 !important;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Color del valor numérico de la métrica */
+        div[data-testid="metric-container"] > div:nth-child(2) {
+            color: #ffffff !important;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        /* Badges de algoritmos elegantes */
+        .algo-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Títulos y separadores más limpios */
+        h1, h2, h3, h4 {
+            color: #f8fafc;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        hr {
+            border-color: #2d2d44;
+        }
+        
+        /* Borde sutil del sidebar */
+        div[data-testid="stSidebar"] { border-right: 1px solid #2d2d44; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -167,18 +228,18 @@ st.markdown(
 
 # ─── Sidebar ─────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🧩 Maze Solver")
+    st.markdown("## Maze Solver")
     st.markdown("*Visualizador de algoritmos de búsqueda*")
     st.divider()
 
-    st.markdown("### 📂 Laberinto")
+    st.markdown("### Laberinto")
     uploaded_file = st.file_uploader(
         "Cargar archivo `.txt`",
         type=["txt"],
         help="Formato: matriz de 0s (paso libre), 1s (pared), 2 (inicio), 3 (meta)",
     )
 
-    st.markdown("### ⚙️ Algoritmo")
+    st.markdown("### Algoritmo")
     algorithm_name = st.selectbox(
         "Algoritmo",
         ["BFS", "DFS", "Greedy", "A*"],
@@ -192,9 +253,9 @@ with st.sidebar:
         disabled=algorithm_name in ["BFS", "DFS"],
     )
 
-    st.markdown("### 🎨 Visualización")
+    st.markdown("### Visualización")
     show_explored  = st.checkbox("Mostrar nodos explorados", value=True)
-    interactive    = st.checkbox("🖱️ Vista interactiva (Plotly)", value=False,
+    interactive    = st.checkbox("Vista interactiva (Plotly)", value=False,
                                 help="Activa hover con info de cada celda: coordenadas, tipo, orden de exploración.")
     animate        = st.checkbox("Animar solución", disabled=interactive)
     if animate and not interactive:
@@ -203,18 +264,18 @@ with st.sidebar:
         speed = 30
 
     st.divider()
-    run_button = st.button("▶ Ejecutar Solver", width="stretch", type="primary")
+    run_button = st.button("Ejecutar Solver", width="stretch", type="primary")
 
     st.markdown("---")
     st.caption("Proyecto 2 · Inteligencia Artificial")
 
 
 # ─── Contenido principal ─────────────────────────────────────────────────────
-st.markdown("# 🧩 Maze Solver")
+st.markdown("# Maze Solver")
 st.markdown("Visualización del proceso de búsqueda de algoritmos en laberintos")
 
 if not uploaded_file:
-    st.info("👈 Sube un archivo de laberinto en el panel lateral para comenzar.", icon="📂")
+    st.info("Sube un archivo de laberinto en el panel lateral para comenzar.")
     st.stop()
 
 # ── Parsear laberinto ─────────────────────────────────────────────────────────
@@ -227,7 +288,7 @@ for line in uploaded_file:
 start, goal = find_start_goal(maze_grid)
 
 if start is None or goal is None:
-    st.error("❌ El laberinto debe contener un punto de inicio (2) y una meta (3).")
+    st.error("El laberinto debe contener un punto de inicio (2) y una meta (3).")
     st.stop()
 
 maze = Maze(maze_grid, start, goal)
@@ -275,7 +336,7 @@ if st.session_state.get("ran") and "result" in st.session_state:
     efficiency     = result["path_length"] / max(result["nodes_explored"], 1) * 100
     bf             = branching_factor(result["nodes_explored"], result["path_length"])
 
-    tab1, tab2, tab3, tab4 = st.tabs(["🗺 Solución", "📊 Métricas", "⚖️ Comparación", "🧪 Benchmark"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Solución", "Métricas", "Comparación", "Benchmark"])
 
     # ══════════════════════════════════════════════
     # TAB 1 — Solución visual
@@ -284,7 +345,7 @@ if st.session_state.get("ran") and "result" in st.session_state:
         col_info, col_maze = st.columns([1, 2.5])
 
         with col_info:
-            st.markdown("#### ℹ️ Info del laberinto")
+            st.markdown("#### Información del laberinto")
             st.markdown(f"**Tamaño:** {maze.rows} × {maze.cols}")
             st.markdown(f"**Celdas totales:** `{total_cells}`")
             st.markdown(f"**Inicio:** `{maze.start}`")
@@ -297,14 +358,14 @@ if st.session_state.get("ran") and "result" in st.session_state:
                 st.markdown(f"**Heurística:** `{heur_used}`")
 
             st.divider()
-            st.markdown("#### 📌 Resultados")
-            st.metric("📏 Path Length",      result["path_length"])
-            st.metric("🔍 Nodos Explorados", result["nodes_explored"])
-            st.metric("⏱ Runtime",          f"{result['runtime']:.5f} s")
-            st.metric("📐 % Explorado",      f"{explored_ratio:.1f}%")
-            st.metric("✅ Eficiencia",       f"{efficiency:.1f}%",
+            st.markdown("#### Resultados")
+            st.metric("Longitud del camino", result["path_length"])
+            st.metric("Nodos Explorados", result["nodes_explored"])
+            st.metric("Tiempo de ejecución", f"{result['runtime']:.5f} s")
+            st.metric("% Explorado", f"{explored_ratio:.1f}%")
+            st.metric("Eficiencia", f"{efficiency:.1f}%",
                       help="Path length / nodos explorados × 100")
-            st.metric("🌿 Branching Factor",  f"{bf:.4f}",
+            st.metric("Factor de Ramificación", f"{bf:.4f}",
                       help="Factor de ramificación efectivo: N^(1/d)")
 
         with col_maze:
@@ -327,7 +388,7 @@ if st.session_state.get("ran") and "result" in st.session_state:
                     )
                     st.plotly_chart(fig_plotly, width="stretch")
                 except ImportError:
-                    st.error("❌ Plotly no está instalado. Ejecuta: `pip install plotly`")
+                    st.error("Plotly no está instalado. Ejecuta: pip install plotly")
                     fig = visualize_maze(
                         maze, path=result["path"],
                         explored=result["explored"] if show_explored else None,
@@ -350,11 +411,11 @@ if st.session_state.get("ran") and "result" in st.session_state:
         st.markdown(f"### Métricas de **{st.session_state.get('algo_name', algorithm_name)}**")
 
         m1, m2, m3, m4, m5 = st.columns(5)
-        m1.metric("📏 Path Length",      result["path_length"])
-        m2.metric("🔍 Nodos Explorados", result["nodes_explored"])
-        m3.metric("⏱ Runtime (s)",       f"{result['runtime']:.5f}")
-        m4.metric("📐 % Explorado",      f"{explored_ratio:.1f}%")
-        m5.metric("🌿 Branching Factor",  f"{bf:.4f}",
+        m1.metric("Longitud del camino", result["path_length"])
+        m2.metric("Nodos Explorados", result["nodes_explored"])
+        m3.metric("Tiempo de ejecución", f"{result['runtime']:.5f}")
+        m4.metric("% Explorado", f"{explored_ratio:.1f}%")
+        m5.metric("Factor de Ramificación", f"{bf:.4f}",
                   help="Factor de ramificación efectivo b ≈ N^(1/d)")
 
         st.divider()
@@ -380,15 +441,15 @@ if st.session_state.get("ran") and "result" in st.session_state:
                         "Tipo:N",
                         scale=alt.Scale(
                             domain=["Exploradas", "Sin explorar"],
-                            range=["#FFD54F", "#2A2A4A"],
+                            range=["#1E40AF", "#475569"],
                         ),
-                        legend=alt.Legend(labelColor="#E8E8F0", titleColor="#E8E8F0"),
+                        legend=alt.Legend(labelColor="#F8FAFC", titleColor="#F8FAFC"),
                     ),
                     tooltip=["Tipo:N", "Celdas:Q"],
                 )
-                .properties(height=220, title=alt.TitleParams("Celdas libres exploradas", color="#E8E8F0"))
+                .properties(height=220, title=alt.TitleParams("Celdas libres exploradas", color="#F8FAFC"))
                 .configure_view(strokeOpacity=0)
-                .configure(background="#1A1A3E")
+                .configure(background="transparent")
             )
             st.altair_chart(pie, width="stretch")
 
@@ -403,30 +464,30 @@ if st.session_state.get("ran") and "result" in st.session_state:
                 alt.Chart(ratio_data)
                 .mark_bar(cornerRadiusTopLeft=5, cornerRadiusTopRight=5)
                 .encode(
-                    x=alt.X("Tipo:N", axis=alt.Axis(labelColor="#E8E8F0", title="")),
-                    y=alt.Y("Nodos:Q", axis=alt.Axis(labelColor="#E8E8F0")),
+                    x=alt.X("Tipo:N", axis=alt.Axis(labelColor="#94A3B8", title="")),
+                    y=alt.Y("Nodos:Q", axis=alt.Axis(labelColor="#94A3B8")),
                     color=alt.Color(
                         "Tipo:N",
                         scale=alt.Scale(
                             domain=["Path óptimo", "Nodos extra explorados"],
-                            range=["#00B0FF", "#FF6D00"],
+                            range=["#06B6D4", "#F43F5E"],
                         ),
                         legend=None,
                     ),
                     tooltip=["Tipo:N", "Nodos:Q"],
                 )
-                .properties(height=220, title=alt.TitleParams("Path vs Overhead de exploración", color="#E8E8F0"))
+                .properties(height=220, title=alt.TitleParams("Path vs Overhead de exploración", color="#F8FAFC"))
                 .configure_view(strokeOpacity=0)
-                .configure(background="#1A1A3E", axis=alt.AxisConfig(gridColor="#2A2A4A"))
+                .configure(background="transparent", axis=alt.AxisConfig(gridColor="#334155", domainColor="#334155"))
             )
             st.altair_chart(bars, width="stretch")
 
         # ── Mapa de calor del algoritmo seleccionado ──────────────────────────
         st.divider()
-        st.markdown("#### 🌡️ Mapa de Calor de Exploración")
+        st.markdown("#### Mapa de Calor de Exploración")
         st.caption(
             "Muestra **en qué orden** el algoritmo descubrió cada celda. "
-            "🟡 Amarillo = explorado primero · 🔴 Rojo oscuro = explorado al final. "
+            "Amarillo = explorado primero · Rojo oscuro = explorado al final. "
             "Las celdas en gris nunca fueron alcanzadas."
         )
 
@@ -445,7 +506,7 @@ if st.session_state.get("ran") and "result" in st.session_state:
         st.caption("Cada mapa muestra la geometría de búsqueda característica del algoritmo.")
 
         heat_cols = st.columns(2)
-        badge_colors = {"BFS": "#00B0FF", "DFS": "#FF6D00", "Greedy": "#00E676", "A*": "#FF4081"}
+        badge_colors = {"BFS": "#06B6D4", "DFS": "#F43F5E", "Greedy": "#10B981", "A*": "#6366F1"}
         for h_idx, r in enumerate(all_results):
             with heat_cols[h_idx % 2]:
                 aname = r["Algorithm"]
@@ -478,13 +539,13 @@ if st.session_state.get("ran") and "result" in st.session_state:
             "Branching Factor":  branching_factor(r["Nodes Explored"], r["Path Length"]),
         } for r in all_results])
 
-        # Resaltado: verde para mínimo, rojo suave para máximo
+        # Resaltado: verde mudo para mínimo, rosado mudo para máximo (Slate-theme friendly)
         styled = df_display.style.highlight_min(
             subset=["Path Length", "Nodos Explorados", "Runtime (s)", "Branching Factor"],
-            color="#1A4731",
+            color="#064E3B",  # Emerald 900
         ).highlight_max(
             subset=["Path Length", "Nodos Explorados", "Runtime (s)", "Branching Factor"],
-            color="#4A1A1A",
+            color="#881337",  # Rose 900
         ).format({"Runtime (s)": "{:.6f}", "Branching Factor": "{:.4f}"})
 
 
@@ -507,7 +568,7 @@ if st.session_state.get("ran") and "result" in st.session_state:
         col_dl, _ = st.columns([1, 3])
         with col_dl:
             st.download_button(
-                label="⬇️ Descargar resultados (CSV)",
+                label="Descargar resultados (CSV)",
                 data=df_export.to_csv(index=False).encode("utf-8"),
                 file_name=f"maze_results_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.csv",
                 mime="text/csv",
@@ -567,7 +628,7 @@ if st.session_state.get("ran") and "result" in st.session_state:
     # TAB 4 — Benchmark automático
     # ══════════════════════════════
     with tab4:
-        st.markdown("### 🧪 Benchmark automático")
+        st.markdown("### Benchmark automático")
         st.caption(
             "Ejecuta múltiples experimentos con pares **(start, goal) aleatorios** "
             "sobre el mismo laberinto y calcula estadísticas agregadas por algoritmo."
@@ -576,20 +637,20 @@ if st.session_state.get("ran") and "result" in st.session_state:
         bcol1, bcol2, bcol3 = st.columns([1, 1, 2])
         with bcol1:
             n_exp = st.number_input(
-                "🔢 Número de experimentos", min_value=5, max_value=100,
+                "Número de experimentos", min_value=5, max_value=100,
                 value=20, step=5,
                 help="Cada experimento usa un par (start, goal) diferente y aleatorio.",
             )
         with bcol2:
             bench_seed = st.number_input(
-                "🎲 Semilla aleatoria", min_value=0, max_value=9999,
+                "Semilla aleatoria", min_value=0, max_value=9999,
                 value=42, step=1,
                 help="Cambia la semilla para obtener distintos pares aleatorios.",
             )
         with bcol3:
             st.markdown("")
             run_bench = st.button(
-                "▶ Run Benchmark", type="primary",
+                "Ejecutar Benchmark", type="primary",
                 help="Ejecuta los 4 algoritmos sobre N pares aleatorios.",
             )
 
@@ -610,10 +671,10 @@ if st.session_state.get("ran") and "result" in st.session_state:
             valid_n  = st.session_state["bench_valid"]
             n_total  = st.session_state["bench_n"]
 
-            st.success(f"✅ {valid_n}/{n_total} experimentos válidos completados.")
+            st.success(f"{valid_n}/{n_total} experimentos válidos completados.")
 
             # ── Tabla de estadísticas ─────────────────────────────────────
-            st.markdown("#### 📊 Estadísticas por algoritmo")
+            st.markdown("#### Estadísticas por algoritmo")
             styled_bench = df_stats.style.highlight_min(
                 subset=["Avg Runtime (s)", "Avg Nodos", "Avg Path"],
                 color="#1A4731",
@@ -637,8 +698,8 @@ if st.session_state.get("ran") and "result" in st.session_state:
             import altair as alt
 
             _BENCH_COLORS = {
-                "BFS": "#00B0FF", "DFS": "#FF6D00",
-                "Greedy": "#00E676", "A*": "#FF4081",
+                "BFS": "#06B6D4", "DFS": "#F43F5E",
+                "Greedy": "#10B981", "A*": "#6366F1",
             }
             _bench_scale = alt.Scale(
                 domain=list(_BENCH_COLORS.keys()),
@@ -650,19 +711,19 @@ if st.session_state.get("ran") and "result" in st.session_state:
                     alt.Chart(df_raw)
                     .mark_line(point=True, strokeWidth=2)
                     .encode(
-                        x=alt.X("Experimento:Q", axis=alt.Axis(labelColor="#E8E8F0")),
+                        x=alt.X("Experimento:Q", axis=alt.Axis(labelColor="#94A3B8")),
                         y=alt.Y(f"{y_field}:Q", title=y_title,
-                                axis=alt.Axis(labelColor="#E8E8F0", titleColor="#E8E8F0")),
+                                axis=alt.Axis(labelColor="#94A3B8", titleColor="#F8FAFC")),
                         color=alt.Color("Algoritmo:N", scale=_bench_scale,
-                                        legend=alt.Legend(labelColor="#E8E8F0", titleColor="#E8E8F0")),
+                                        legend=alt.Legend(labelColor="#94A3B8", titleColor="#F8FAFC")),
                         tooltip=["Algoritmo:N", "Experimento:Q",
                                  alt.Tooltip(f"{y_field}:Q", format=f".{fmt}")],
                     )
                     .properties(height=260)
                     .configure_view(strokeOpacity=0)
                     .configure(
-                        background="#1A1A3E",
-                        axis=alt.AxisConfig(gridColor="#2A2A4A"),
+                        background="transparent",
+                        axis=alt.AxisConfig(gridColor="#334155", domainColor="#334155"),
                     )
                 )
 
@@ -683,17 +744,17 @@ if st.session_state.get("ran") and "result" in st.session_state:
             dl1, dl2, _ = st.columns([1, 1, 2])
             with dl1:
                 st.download_button(
-                    label="⬇️ Resumen (CSV)",
+                    label="Descargar Resumen (CSV)",
                     data=df_stats.to_csv(index=False).encode("utf-8"),
                     file_name=f"benchmark_summary_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.csv",
                     mime="text/csv",
                 )
             with dl2:
                 st.download_button(
-                    label="⬇️ Datos crudos (CSV)",
+                    label="Descargar Datos Crudos (CSV)",
                     data=df_raw.to_csv(index=False).encode("utf-8"),
                     file_name=f"benchmark_raw_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.csv",
                     mime="text/csv",
                 )
         else:
-            st.info("👆 Configura los parámetros y presiona **Run Benchmark** para comenzar.", icon="🧪")
+            st.info("Configura los parámetros y presiona **Ejecutar Benchmark** para comenzar.")
