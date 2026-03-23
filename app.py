@@ -153,8 +153,8 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-        /* Ocultar header y footer nativos de Streamlit */
-        header {visibility: hidden;}
+        /* Ocultar menú y footer nativos de Streamlit, manteniendo el botón de la barra lateral */
+        #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         
         /* Espaciado del lienzo principal */
