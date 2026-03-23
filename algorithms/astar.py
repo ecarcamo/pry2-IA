@@ -53,6 +53,10 @@ def astar(maze, heuristic):
     return path, nodes_explored, explored_order
 
 def reconstruct_path(parent, start, goal):
+    """Reconstruye el camino de start a goal. Retorna [] si no hay camino."""
+
+    if goal not in parent and goal != start:
+        return []
 
     path = []
 

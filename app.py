@@ -280,15 +280,54 @@ if not uploaded_file:
 
 # ── Parsear laberinto ─────────────────────────────────────────────────────────
 maze_grid = []
-for line in uploaded_file:
-    row = [int(c) for c in line.decode().strip() if c in "01234"]
+_parse_errors = []
+for _i, line in enumerate(uploaded_file):
+    raw = line.decode().strip()
+    invalid_chars = [c for c in raw if c not in "01234"]
+    if invalid_chars:
+        _parse_errors.append(f"Línea {_i+1}: caracteres inválidos → {set(invalid_chars)}")
+    row = [int(c) for c in raw if c in "01234"]
     if row:
         maze_grid.append(row)
+
+if _parse_errors:
+    st.warning("⚠️ El archivo contiene caracteres ignorados:\n" + "\n".join(_parse_errors))
+
+# Validar que todas las filas tengan la misma longitud
+_row_lengths = {len(r) for r in maze_grid}
+if len(_row_lengths) > 1:
+    st.error(f"❌ Las filas del laberinto no tienen el mismo ancho: {sorted(_row_lengths)}. Revisa el archivo .txt.")
+    st.stop()
 
 start, goal = find_start_goal(maze_grid)
 
 if start is None or goal is None:
-    st.error("El laberinto debe contener un punto de inicio (2) y una meta (3).")
+    st.error("❌ El laberinto debe contener un punto de inicio (2) y una meta (3).")
+    st.stop()
+
+# Validar conectividad con BFS rápido antes de correr los algoritmos
+def _check_connected(grid, s, g):
+    from collections import deque
+    q = deque([s])
+    seen = {s}
+    moves = [(-1,0),(1,0),(0,-1),(0,1)]
+    while q:
+        r, c = q.popleft()
+        if (r, c) == g:
+            return True
+        for dr, dc in moves:
+            nr, nc = r+dr, c+dc
+            if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]):
+                if grid[nr][nc] != 1 and (nr, nc) not in seen:
+                    seen.add((nr, nc))
+                    q.append((nr, nc))
+    return False
+
+if not _check_connected(maze_grid, start, goal):
+    st.error(
+        f"❌ No existe ningún camino entre el inicio {start} y la meta {goal} en este laberinto. "
+        "Verifica que no haya paredes bloqueando completamente el recorrido."
+    )
     st.stop()
 
 maze = Maze(maze_grid, start, goal)
